@@ -17,7 +17,8 @@
 		"underscore": "*",
 		"mocha": "*",
 		"should": "*",
-		"async": "*"
+		"async": "*",
+		"supertest": "*"
 	},
 	"keywords": [
 		"rest",

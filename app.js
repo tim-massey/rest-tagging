@@ -35,18 +35,26 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
     next();
   });
 
+  app.use(express.bodyParser()); 
+  
   app.configure(function() {
     app.use(express.logger("dev"));
-    app.use(express.bodyParser());
   });
 
-  app.put('/' + RESTPREFIX + '/id/:bucket/:id', function(req, res) {
+  app.get('/', function(req, res) {
+      res.send({"tags": true});
+  });
+  
+  app.put(RESTPREFIX + '/:bucket/:id', function(req, res) {
     var tags;
-    tags = JSON.parse(req.query.tags || "[]");
+    tags = req.body.tags || "[]";
+    score = req.body.score || 0;
+    console.log("tags: "+tags);
+    console.log("score: "+score);
     rt.set({
       bucket: req.params.bucket,
       id: req.params.id,
-      score: req.query.score,
+      score: score,
       tags: tags
     }, function(err, resp) {
       if (err) {
@@ -57,7 +65,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
     });
   });
 
-  app["delete"]('/' + RESTPREFIX + '/id/:bucket/:id', function(req, res) {
+  app["delete"](RESTPREFIX + '/:bucket/:id', function(req, res) {
     return rt.remove(req.params, function(err, resp) {
       if (err) {
         res.send(err, 500);
@@ -67,7 +75,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
     });
   });
 
-  app.get('/' + RESTPREFIX + '/id/:bucket/:id', function(req, res) {
+  app.get(RESTPREFIX + '/:bucket/:id', function(req, res) {
     return rt.get(req.params, function(err, resp) {
       if (err) {
         res.send(err, 500);
@@ -77,7 +85,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
     });
   });
 
-  app.get('/' + RESTPREFIX + '/allids/:bucket', function(req, res) {
+  app.get(RESTPREFIX + '/:bucket/allids', function(req, res) {
     return rt.allids(req.params, function(err, resp) {
       if (err) {
         res.send(err, 500);
@@ -87,7 +95,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
     });
   });
 
-  app.get('/' + RESTPREFIX + '/tags/:bucket', function(req, res) {
+  app.get(RESTPREFIX + '/:bucket/tags', function(req, res) {
     req.query.bucket = req.params.bucket;
     req.query.tags = JSON.parse(req.query.tags || "[]");
     return rt.tags(req.query, function(err, resp) {
@@ -99,7 +107,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
     });
   });
 
-  app.get('/' + RESTPREFIX + '/toptags/:bucket/:amount', function(req, res) {
+  app.get(RESTPREFIX + '/:bucket/toptags/:amount', function(req, res) {
     return rt.toptags(req.params, function(err, resp) {
       if (err) {
         res.send(err, 500);
@@ -109,7 +117,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
     });
   });
 
-  app.get('/' + RESTPREFIX + '/buckets', function(req, res) {
+  app.get(RESTPREFIX + '/buckets', function(req, res) {
     return rt.buckets(function(err, resp) {
       if (err) {
         res.send(err, 500);
@@ -119,7 +127,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
     });
   });
 
-  app["delete"]('/' + RESTPREFIX + '/bucket/:bucket', function(req, res) {
+  app["delete"](RESTPREFIX + '/:bucket', function(req, res) {
     rt.removebucket(req.params, function(err, resp) {
       console.log(resp);
       if (err) {

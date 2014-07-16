@@ -1,6 +1,6 @@
 {
 	"port": 8102,
-	"rest_path_prefix": "rt",
+	"rest_path_prefix": "",
 	"redis": {
 		"host": "127.0.0.1",
 		"port": 6379,
