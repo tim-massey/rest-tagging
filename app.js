@@ -42,7 +42,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
   });
 
   app.get('/', function(req, res) {
-      res.send({"tags": true});
+      res.send({"up": true});
   });
   
   app.put(RESTPREFIX + '/:bucket/:id', function(req, res) {
@@ -75,6 +75,28 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
     });
   });
 
+  app.get(RESTPREFIX + '/:bucket', function(req, res) {
+      req.query.bucket = req.params.bucket;
+      req.query.tags = JSON.parse(req.query.tags || "[]");
+      return rt.tags(req.query, function(err, resp) {
+        if (err) {
+          res.send(err, 500);
+          return;
+        }
+        res.send(resp);
+      });
+    });
+  
+  app.get(RESTPREFIX + '/:bucket/ids', function(req, res) {
+      return rt.allids(req.params, function(err, resp) {
+        if (err) {
+          res.send(err, 500);
+          return;
+        }
+        res.send(resp);
+      });
+    });
+  
   app.get(RESTPREFIX + '/:bucket/:id', function(req, res) {
     return rt.get(req.params, function(err, resp) {
       if (err) {
@@ -85,27 +107,9 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
     });
   });
 
-  app.get(RESTPREFIX + '/:bucket/allids', function(req, res) {
-    return rt.allids(req.params, function(err, resp) {
-      if (err) {
-        res.send(err, 500);
-        return;
-      }
-      res.send(resp);
-    });
-  });
+  
 
-  app.get(RESTPREFIX + '/:bucket/tags', function(req, res) {
-    req.query.bucket = req.params.bucket;
-    req.query.tags = JSON.parse(req.query.tags || "[]");
-    return rt.tags(req.query, function(err, resp) {
-      if (err) {
-        res.send(err, 500);
-        return;
-      }
-      res.send(resp);
-    });
-  });
+  
 
   app.get(RESTPREFIX + '/:bucket/toptags/:amount', function(req, res) {
     return rt.toptags(req.params, function(err, resp) {
