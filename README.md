@@ -22,35 +22,47 @@ Redis Tagging uses the concept of buckets (you might call them namespaces). This
 A bucket name must be alphanumeric including `-` and `_` and between 1 and 80 characters in length.  
 There is no limit on ids and tags. They could include any character.
 
-### PUT /rt/id/:bucket/:id
+### PUT /:bucket_id/:item_id
 
 Add or update an item. The URL contains the bucket (e.g. 'concerts') and the id for this item.
 
-Parameters (as query parameters):
+Parameters (as JSON body):
 
-* tags (String) A JSON string with an array of one or more tags (e.g. ["chicago","rock"])
-* score (Number) *optional* Default: 0 This is the sorting criteria for this item
+* tags (array) A JSON array with an array of one or more (string) tags (e.g. ["chicago","rock"])
+* score (integer) *optional* Default: 0 This is the sorting criteria for this item
 
 
 Example:
 
-`PUT /rt/id/concerts/571fc1ba4d?score=20130823&tags=["rock","stadium"]`
+`PUT /concerts/571fc1ba4d`
+
+With a body of:
+
+```json
+{
+    "score": 20130823,
+    "tags": [
+        "rock",
+        "stadium"
+     ]
+}
+```
 
 Returns:
 
 `true`
 
-### DELETE /rt/id/:bucket/:id
+### DELETE /:bucket_id/:item_id
 
 Delete an item and all its tag associations.
 
-Example: `DELETE /rt/id/concerts/12345`
+Example: `DELETE /concerts/12345`
 
 Returns:
 
 `true`
 
-### GET /rt/tags/:bucket?queryparams
+### GET /:bucket_id?query_params
 
 **The main method.** Return the IDs for one or more tags. When more than one tag is supplied the query can be an intersection (default) or a union.  
 `type=inter` (default) only those IDs will be returned where all tags match.  
@@ -67,7 +79,7 @@ Parameters:
 
 Example:
 
-`GET /rt/tags/concerts?tags=["Berlin","rock"]&limit=2&offset=4&type=inter`
+`GET /concerts?tags=["Berlin","rock"]&limit=2&offset=4&type=inter`
 
 Returns: 
 
@@ -87,13 +99,13 @@ SELECT * FROM Concerts WHERE ID IN (8167,25652) ORDER BY Timestamp DESC
 ```
 
 
-### GET /rt/toptags/:bucket/:amount
+### GET /:bucket_id/toptags/:amount
 
 Get the top *n* tags of a bucket.
 
 Example:
 
-`GET /rt/toptags/concerts/3`
+`GET /concerts/toptags/3`
 
 Returns:
 
@@ -108,13 +120,13 @@ Returns:
 }
 ```
 
-### GET */rt/id/:bucket/:id*
+### GET */:bucket_id/:item_id*
 
 Get all associated tags for an item. Usually this operation is not needed as you will want to store all tags for an item in you database.
 
 Example:
 
-`GET /rt/id/concerts/12345`
+`GET /concerts/12345`
 
 Returns:
 
@@ -126,13 +138,13 @@ Returns:
 ]
 ```
 
-### GET /rt/allids/:bucket
+### GET /:bucket_id/ids/
 
 Get all IDs saved in a bucket.
 
 Example:
 
-`GET /rt/allids/concerts`
+`GET /concerts/ids`
 
 Returns:
 
@@ -144,14 +156,14 @@ Returns:
 ]
 ```
 
-### GET /rt/buckets
+### GET /buckets
 
 List all buckets.
 **Note:** This uses redis.keys. Use with care! It will slow down Redis when lots of keys are stored in Redis.
 
 Example:
 
-`GET /rt/buckets`
+`GET /buckets`
 
 Returns:
 
@@ -165,13 +177,13 @@ Returns:
 
 
 
-### DELETE /rt/removebucket/:bucket
+### DELETE /:bucket_id
 
 Remove a single bucket.
 
 Example:
 
-`DELETE /rt/removebucket/concerts`
+`DELETE /concerts`
 
 Returns:
 
