@@ -30,11 +30,11 @@ task :production do
 # skip using nave on production server
   set :use_nave, false
   set :branch, 'master' #default
-  set :user, 'tim'
+  set :user, 'deploy'
 
   set :deploy_to, "/home/#{user}/deployments/#{application}"  #capper defaults to "/var/app/#{application}"
   set :node_env, 'production'
-  server 'bacon.basecode.net', :app  #add more / different roles
+  server 'tuna.basecode.net', :app  #add more / different roles
   set :forever_cmd, "./node_modules/.bin/forever"  #use the forever that is installed along with the app
 end
 
